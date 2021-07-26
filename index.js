@@ -3,9 +3,10 @@ const github = require("@actions/github")
 const sodium = require("tweetsodium")
 
 class GithubLocation {
-  constructor(location_input) {
+  constructor(location_input, environment_input) {
     this.type = "repository"
     this.short_type = "Repo"
+    this.environment = environment_input
     if (!location_input) {
       const context = github.context
       this.data = context.repo
@@ -16,6 +17,12 @@ class GithubLocation {
       this.type = "organization"
       this.short_type = "Org"
       this.data = {org: location_input}
+    }
+    if (this.environment) {
+      if (this.type == "organization") {
+        throw {message: 'environment secrets on organization are not supported'}
+      }
+      this.short_type = "Environment"
     }
   }
   toString() {
@@ -30,7 +37,8 @@ async function run() {
     const input_value = core.getInput("value")
 
     const input_location = core.getInput("location")
-    const secret_target = new GithubLocation(input_location)
+    const input_environment = core.getInput("environment")
+    const secret_target = new GithubLocation(input_location, input_environment)
 
     const input_pat = core.getInput("pa_token")
     const octokit = github.getOctokit(input_pat)

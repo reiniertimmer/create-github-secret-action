@@ -41,6 +41,19 @@ steps:
       pa_token: ${{ secrets.PAT_STRATEGIC_AIR_COMMAND }}
 ```
 
+Create a secret in a repository environment:
+
+```yaml
+steps:
+  - uses: gliech/create-github-secret-action@v1
+    with:
+      location: horde-prime/spire-network
+      environment: test
+      name: BROADCAST_FREQUENCY
+      value: ${{ secrets.JAMMING_FREQUENCY }}
+      pa_token: ${{ secrets.PAT_WRONG_HORDAK }}
+```
+
 ## Inputs
 
 #### `name`
@@ -56,6 +69,11 @@ steps:
 Name of a GitHub repository or organization where you want to create/update a
 secret. Expects the notation `owner/repo` for repositories. Defaults to the
 repository that invoked the workflow.
+
+#### `environment`
+Name of a GitHub repository environment where the secret is to be added. The
+location type should *not* be of type "organization" (organization environments
+are not supported by GitHub at this moment)
 
 #### `pa_token`
 **(Required)** Personal access token with permission to modify repository or
