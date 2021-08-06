@@ -9251,12 +9251,34 @@ class GithubLocation {
       this.data = {org: location_input}
     }
     if (this.environment) {
-      if (this.type == "organization") {
+      if (this.type === "organization") {
         throw {message: 'environment secrets on organization are not supported'}
       }
+      this.type = "environment"
       this.short_type = "Environment"
     }
   }
+  async setEnvironmentData(octokit) {
+    const repo = await octokit.rest.repos.get(this.data)
+    console.log(`repo data ${JSON.stringify(repo, null, 2)}`)
+    this.data = {repository_id: repo.data.id, environment_name: this.environment}
+  }
+
+  // getPublicKey(octokit) {
+  //   switch (this.type) {
+  //     case "organization": {
+  //       return this.octokit.rest.actions.getOrgPublicKey(this.data)
+  //     }
+  //     case "repository": {
+  //       return this.octokit.rest.actions.getRepoPublicKey(this.data)
+  //     }
+  //     case "environment": {
+  //       return this.octokit.rest.actions.getEnvironmentPublicKey({
+  //         environment_name: this.environment
+  //       })
+  //     }
+  //   }
+  // }
   toString() {
     return Object.values(this.data).join("/")
   }
@@ -9274,6 +9296,11 @@ async function run() {
 
     const input_pat = core.getInput("pa_token")
     const octokit = github.getOctokit(input_pat)
+
+    if (secret_target.type == "environment") {
+      await secret_target.setEnvironmentData(octokit)
+    }
+
     const get_public_key = octokit.rest.actions[`get${secret_target.short_type}PublicKey`]
     const upsert_secret = octokit.rest.actions[`createOrUpdate${secret_target.short_type}Secret`]
 
