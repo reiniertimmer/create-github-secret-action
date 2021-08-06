@@ -9260,25 +9260,8 @@ class GithubLocation {
   }
   async setEnvironmentData(octokit) {
     const repo = await octokit.rest.repos.get(this.data)
-    console.log(`repo data ${JSON.stringify(repo, null, 2)}`)
     this.data = {repository_id: repo.data.id, environment_name: this.environment}
   }
-
-  // getPublicKey(octokit) {
-  //   switch (this.type) {
-  //     case "organization": {
-  //       return this.octokit.rest.actions.getOrgPublicKey(this.data)
-  //     }
-  //     case "repository": {
-  //       return this.octokit.rest.actions.getRepoPublicKey(this.data)
-  //     }
-  //     case "environment": {
-  //       return this.octokit.rest.actions.getEnvironmentPublicKey({
-  //         environment_name: this.environment
-  //       })
-  //     }
-  //   }
-  // }
   toString() {
     return Object.values(this.data).join("/")
   }
