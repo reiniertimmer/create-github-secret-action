@@ -48,7 +48,10 @@ async function run() {
     const input_pat = core.getInput("pa_token")
     const octokit = github.getOctokit(input_pat)
 
+    core.info(`running on ${secret_target.type} ${secret_target.data}`)
+
     if (secret_target.type == "environment") {
+      core.info(`retrieving repo information`)
       await secret_target.setEnvironmentData(octokit)
     }
 
